@@ -1,17 +1,17 @@
 # Game API Project Overview
 In the Developing Scalable Apps with Python course you learned how to write platform-agnostic apps using Google App Engine backed by Google Datastore.
- 
+
 In this project you will use these skills to develop your own game!
 You will write an API with endpoints that will allow anyone to develop a front-end for your game.
-Since you aren't required to write a front-end you can use API explorer to test your API.Let's get started!
- 
+Since you aren't required to write a front-end you can use API explorer to test your API. Let's get started!
+
 ### Task 1: Explore the Architecture
 Get the skeleton 'Guess a Number' application up and running.
 Read through the code and documentation, and test the endpoints with API explorer.
 Make sure you understand how different entities are created, how they work together, and the overall flow of a game.
 Create a `User` or two and play a few games.
 Make sure to take a look at the admin Datastore viewer to check out the various entities.
-The datastore is typically at <a href="http://localhost:8000" target="_blank">http://localhost:8000</a>, but you may need to access it on another port.
+The datastore is typically at <a href="http://localhost:8000" target='blank>http://localhost:8000</a>, but you may need to access it on another port.
 
 ### Task 2: Implement Your Own Game
 Come up with a new game to implement!
@@ -44,7 +44,7 @@ For example in 'Guess a Number' the Score model stores the number of guesses tak
 Two player games do not need to implement this feature.
 
 You can record any other data that you think is interesting or relevant to your particular game.
-       
+
 ### Task 3: Extend Your API
 A well engineered backend should be extensible.
 Let's test that theory and get additional practice working with the Datastore by implementing several new endpoints.
@@ -59,24 +59,24 @@ Finally, these endpoints should be documented in your README just like the ones 
  - **get_user_games**
     - This returns all of a User's active games. <todo what if the player prevented concurrent games? Maybe this should be a list of all games (active or not) that the user is related to>
     - You may want to modify the `User` and `Game` models to simplify this type
-    of query. **Hint:** it might make sense for each game to be a `descendant` 
+    of query. **Hint:** it might make sense for each game to be a `descendant`
     of a `User`.
-    
+
  - **cancel_game**
     - This endpoint allows users to cancel a game in progress.
     You could implement this by deleting the Game model itself, or add a Boolean field such as 'cancelled' to the model.     Ensure that Users are not permitted to remove *completed* games.
-    
+
  - **get_high_scores**
     - Remember how you defined a score in Task 2?
     Now we will use that to generate a list of high scores in descending order, a leader-board!
     - Accept an optional parameter `number_of_results` that limits the number of results returned.
     - Note: If you choose to implement a 2-player game this endpoint is not required.
-    
+
  - **get_user_rankings**
     - Come up with a method for ranking the performance of each player.
       For "Guess a Number" this could be by winning percentage with ties broken by the average number of guesses.
     - Create an endpoint that returns this player ranking. The results should include each Player's name and the 'performance' indicator (eg. win/loss ratio).
- 
+
  - **get_game_history**
     - Your API Users may want to be able to see a 'history' of moves for each game.
     - For example, Chess uses a format called <a href="https://en.wikipedia.org/wiki/Portable_Game_Notation" target="_blank">PGN</a>) which allows any game to be replayed and watched move by move.
@@ -97,7 +97,7 @@ Make sure to update the message to reflect this.
 
 **Optional Improvements:**
 - If you're feeling  ambitious you can implement more sophisticated notifications.
-For example: "If the User has not made a move in an active game for more than 12 hours, send a reminder email that includes the current game state." 
+For example: "If the User has not made a move in an active game for more than 12 hours, send a reminder email that includes the current game state."
 - If you created a two-player game, you can implement a turn notification system!
 When one user makes a move, add a task to the task queue to notify the User's opponent that it's their turn.
 You can use the `SendReminderEmail` handler in main.py as a template.
@@ -117,7 +117,7 @@ You may follow the format of 'Guess a Number' for your README.
 
 ### Reflect on Your Design
 Document your design decisions by answering the following questions:
-   
+
 - What additional properties did you add to your models and why?
 - What were some of the trade-offs or struggles you faced when implementing the new game logic?
 

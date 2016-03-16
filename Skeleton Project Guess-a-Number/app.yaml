@@ -1,4 +1,4 @@
-application: p4-refresh
+application: guess-a-number-1252
 version: 1
 runtime: python27
 api_version: 1
