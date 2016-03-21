@@ -19,14 +19,24 @@ class Game(ndb.Model):
     target = ndb.IntegerProperty(required=True)
     attempts_allowed = ndb.IntegerProperty(required=True)
     attempts_remaining = ndb.IntegerProperty(required=True, default=5)
+    x_range = ndb.IntegerProperty(required=True)
+    stack = ndb.StructuredProperty(required=True)
+    stack_index = ndb.StructuredProperty(required=True)
+    y_range = ndb.IntegerProperty(required=True)
+    num_of_bombs = ndb.IntegerProperty(required=True)
+    num_of_flags = ndb.IntegerProperty(required=True)
+    num_of_tiles = ndb.IntegerProperty(required=True)
+    tiles_flipped = ndb.IntegerProperty(required=True)
+    tiles_remaining = ndb.IntegerProperty(required=True)
+    win = ndb.BooleanProperty(required=True, default=False)
     game_over = ndb.BooleanProperty(required=True, default=False)
     user = ndb.KeyProperty(required=True, kind='User')
 
     @classmethod
-    def new_game(cls, user, min, max, attempts):
+    def new_game(cls, user, difficulty):
         """Creates and returns a new game"""
-        if max < min:
-            raise ValueError('Maximum must be greater than minimum')
+        if difficulty not in DIFFICULTIES:
+            raise ValueError('Invalid difficulty')
         game = Game(user=user,
                     target=random.choice(range(1, max + 1)),
                     attempts_allowed=attempts,
@@ -34,6 +44,7 @@ class Game(ndb.Model):
                     game_over=False)
         game.put()
         return game
+
 
     def to_form(self, message):
         """Returns a GameForm representation of the Game"""
