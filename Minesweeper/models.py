@@ -49,7 +49,9 @@ class Game(ndb.Model):
         form = GameForm()
         form.urlsafe_key = self.key.urlsafe()
         form.user_name = self.user.get().name
-        form.attempts_remaining = self.attempts_remaining
+        form.tiles_remaining = self.attempts_remaining
+        form.flag_remaining = self.flags_remaining
+        form.num_of_bombs = self.num_of_bombs
         form.game_over = self.game_over
         form.message = message
         return form
