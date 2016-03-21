@@ -16,12 +16,9 @@ class User(ndb.Model):
 
 class Game(ndb.Model):
     """Game object"""
-    target = ndb.IntegerProperty(required=True)
-    attempts_allowed = ndb.IntegerProperty(required=True)
-    attempts_remaining = ndb.IntegerProperty(required=True, default=5)
     x_range = ndb.IntegerProperty(required=True)
-    stack = ndb.StructuredProperty(required=True)
-    stack_index = ndb.StructuredProperty(required=True)
+    #stack = ndb.StructuredProperty(required=True)
+    #stack_index = ndb.StructuredProperty(required=True)
     y_range = ndb.IntegerProperty(required=True)
     num_of_bombs = ndb.IntegerProperty(required=True)
     num_of_flags = ndb.IntegerProperty(required=True)
@@ -45,7 +42,8 @@ class Game(ndb.Model):
         game.put()
         return game
 
-
+    def fill_stack(self):
+        return stack
     def to_form(self, message):
         """Returns a GameForm representation of the Game"""
         form = GameForm()
@@ -82,18 +80,18 @@ class Score(ndb.Model):
 class GameForm(messages.Message):
     """GameForm for outbound game state information"""
     urlsafe_key = messages.StringField(1, required=True)
-    attempts_remaining = messages.IntegerField(2, required=True)
-    game_over = messages.BooleanField(3, required=True)
-    message = messages.StringField(4, required=True)
-    user_name = messages.StringField(5, required=True)
+    tiles_remaining = messages.IntegerField(2, required=True)
+    flag_remaining = messages.IntegerField(3, required=True)
+    num_of_bombs = messages.IntegerField(4, required=True)
+    game_over = messages.BooleanField(5, required=True)
+    message = messages.StringField(6, required=True)
+    user_name = messages.StringField(7, required=True)
 
 
 class NewGameForm(messages.Message):
     """Used to create a new game"""
     user_name = messages.StringField(1, required=True)
-    min = messages.IntegerField(2, default=1)
-    max = messages.IntegerField(3, default=10)
-    attempts = messages.IntegerField(4, default=5)
+    difficulty = messages.IntegerField(2, default=1)
 
 
 class MakeMoveForm(messages.Message):

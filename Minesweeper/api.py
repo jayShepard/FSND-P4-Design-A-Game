@@ -27,8 +27,8 @@ USER_REQUEST = endpoints.ResourceContainer(user_name=messages.StringField(1),
 
 MEMCACHE_MOVES_REMAINING = 'MOVES_REMAINING'
 
-@endpoints.api(name='battleship', version='v1')
-class GuessANumberApi(remote.Service):
+@endpoints.api(name='minesweeper', version='v1')
+class MineSweeperApi(remote.Service):
     """Game API"""
     @endpoints.method(request_message=USER_REQUEST,
                       response_message=StringMessage,
@@ -68,7 +68,7 @@ class GuessANumberApi(remote.Service):
         # so it is performed out of sequence.
         taskqueue.add(url='/tasks/cache_average_attempts')
         return game.to_form('Good luck playing Guess a Number!')
-
+'''
     @endpoints.method(request_message=GET_GAME_REQUEST,
                       response_message=GameForm,
                       path='game/{urlsafe_game_key}',
@@ -151,6 +151,6 @@ class GuessANumberApi(remote.Service):
             average = float(total_attempts_remaining)/count
             memcache.set(MEMCACHE_MOVES_REMAINING,
                          'The average moves remaining is {:.2f}'.format(average))
+'''
 
-
-api = endpoints.api_server([GuessANumberApi])
+api = endpoints.api_server([MineSweeperApi])

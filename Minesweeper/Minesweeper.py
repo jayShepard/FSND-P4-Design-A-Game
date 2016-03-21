@@ -6,7 +6,6 @@ class Minesweeper:
     difficulty = ''
     stack = []
     stack_index = []
-    node_list = []
     num_of_flags = None
     num_of_bombs = None
     x_range = None
