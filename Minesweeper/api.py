@@ -88,13 +88,26 @@ class MineSweeperApi(remote.Service):
     def make_move(self, request):
         """Makes a move. Returns a game state with message"""
         game = get_by_urlsafe(request.urlsafe_game_key, Game)
+        msg = ''
         if game.game_over:
             return game.to_form('Game already over!')
 
         if game.first_move == True:
             game.add_bombs(request.tile)
-            game.put()
-            return game.to_form('test')
+            game.flip_tile(request.tile)
+            game.first_move = False
+        else:
+            game.flip_tile(request.tile, request.flag)
+            if game.game_over == True:
+                if game.win == True:
+                    msg = 'You win!'
+                else:
+                    msg = 'You lose!'
+            else:
+                msg = 'Nice move!'
+        game.put()
+        return game.to_form(msg)
+
 '''
     @endpoints.method(response_message=ScoreForms,
                       path='scores',

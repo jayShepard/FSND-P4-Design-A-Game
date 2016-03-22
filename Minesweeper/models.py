@@ -100,6 +100,9 @@ class Game(ndb.Model):
         score.put()
 
     def add_bombs(self, protected_tile):
+        """adds bombs into the stack, making sure not place one on the
+        protected_tile
+        """
         bomb_list =[]
         count = self.num_of_bombs
 
@@ -139,6 +142,51 @@ class Game(ndb.Model):
                     except:
                         continue
         return nodes
+
+    def flip_tile(self, tile, flag=False):
+        #tile_index = self.stack_index.index(tile)
+
+        selected_tile = self.stack[tile]
+
+        if flag == True:
+            if self.flags_remaining == 0:
+                raise ValueError("No flags left")
+            else:
+                selected_tile['flag']=True
+                self.flags_remaining -= 1
+
+        else:
+            if selected_tile['flag'] == True:
+                selected_tile['flag'] == False
+                self.flags_remaining += 1
+
+            else:
+                self.stack[tile]['flip'] = True
+                self.tiles_remaining -= 1
+                if selected_tile['value'] == 'bomb':
+                    self.game_over = True
+                elif selected_tile['value'] == 0:
+                    self.blank_tile_cascade(tile)
+                self.check_win()
+    def blank_tile_cascade(self, tile):
+        """Checks all surrounding nodes for 0 value, and flips them.
+        Recursively checks each new empty node.
+        """
+        nodes = self.find_connecting_indexes(tile)
+        for node in nodes:
+            if self.stack[node]['value'] != 0:
+                self.stack[node]['flip'] = True
+                continue
+            else:
+                if not self.stack[node]['flip']:
+                    self.stack[node]['flip'] = True
+                    self.tiles_remaining -= 1
+                    self.blank_tile_cascade(node)
+
+    def check_win(self):
+        if self.tiles_remaining == self.num_of_bombs:
+            self.game_over = True
+            self.win = True
 
 class Score(ndb.Model):
     """Score object"""
