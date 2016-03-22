@@ -57,16 +57,14 @@ class MineSweeperApi(remote.Service):
             raise endpoints.NotFoundException(
                     'A User with that name does not exist!')
         try:
-            game = Game.new_game(user.key, request.min,
-                                 request.max, request.attempts)
+            game = Game.new_game(user.key, request.difficulty)
         except ValueError:
-            raise endpoints.BadRequestException('Maximum must be greater '
-                                                'than minimum!')
-
+            raise endpoints.BadRequestException('Difficulty must be between '
+                                                    '1 and 3')
         # Use a task queue to update the average attempts remaining.
         # This operation is not needed to complete the creation of a new game
         # so it is performed out of sequence.
-        taskqueue.add(url='/tasks/cache_average_attempts')
+        #taskqueue.add(url='/tasks/cache_average_attempts')
         return game.to_form('Good luck playing Guess a Number!')
 '''
     @endpoints.method(request_message=GET_GAME_REQUEST,

@@ -16,14 +16,16 @@ class User(ndb.Model):
 
 class Game(ndb.Model):
     """Game object"""
+
     x_range = ndb.IntegerProperty(required=True)
-    #stack = ndb.StructuredProperty(required=True)
+    stack = ndb.PickleProperty(required=True)
     #stack_index = ndb.StructuredProperty(required=True)
+    difficulty = ndb.IntegerProperty(required=True)
     y_range = ndb.IntegerProperty(required=True)
     num_of_bombs = ndb.IntegerProperty(required=True)
-    num_of_flags = ndb.IntegerProperty(required=True)
-    num_of_tiles = ndb.IntegerProperty(required=True)
-    tiles_flipped = ndb.IntegerProperty(required=True)
+    flags_remaining = ndb.IntegerProperty(required=True)
+    #num_of_tiles = ndb.IntegerProperty(required=True)
+    #tiles_flipped = ndb.IntegerProperty(required=True)
     tiles_remaining = ndb.IntegerProperty(required=True)
     win = ndb.BooleanProperty(required=True, default=False)
     game_over = ndb.BooleanProperty(required=True, default=False)
@@ -31,25 +33,45 @@ class Game(ndb.Model):
 
     @classmethod
     def new_game(cls, user, difficulty):
+        DIFFICULTIES = [1, 2, 3]
         """Creates and returns a new game"""
         if difficulty not in DIFFICULTIES:
             raise ValueError('Invalid difficulty')
+
         game = Game(user=user,
-                    target=random.choice(range(1, max + 1)),
-                    attempts_allowed=attempts,
-                    attempts_remaining=attempts,
-                    game_over=False)
+                    difficulty=difficulty)
+
+        if difficulty==1:
+            game.x_range = 8
+            game.y_range = 8
+            game.num_of_bombs = 10
+
+        elif difficulty==2:
+            game.x_range = 16
+            game.y_range = 16
+            game.num_of_bombs = 40
+
+        elif difficulty == 3:
+            game.x_range = 16
+            game.y_range = 31
+            game.num_of_bombs = 99
+
+        game.flags_remaining = game.num_of_bombs
+        game.tiles_remaining = (game.x_range*game.y_range)-game.num_of_bombs
+        game.stack = []
+        for i in range(game.x_range):
+            for j in range(game.y_range):
+                game.stack.append([(i, j), 0, False])
+        #self.generate_stack_index()
         game.put()
         return game
 
-    def fill_stack(self):
-        return stack
     def to_form(self, message):
         """Returns a GameForm representation of the Game"""
         form = GameForm()
         form.urlsafe_key = self.key.urlsafe()
         form.user_name = self.user.get().name
-        form.tiles_remaining = self.attempts_remaining
+        form.tiles_remaining = self.tiles_remaining
         form.flag_remaining = self.flags_remaining
         form.num_of_bombs = self.num_of_bombs
         form.game_over = self.game_over
