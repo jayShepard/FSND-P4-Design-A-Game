@@ -24,8 +24,6 @@ class Game(ndb.Model):
     y_range = ndb.IntegerProperty(required=True)
     num_of_bombs = ndb.IntegerProperty(required=True)
     flags_remaining = ndb.IntegerProperty(required=True)
-    #num_of_tiles = ndb.IntegerProperty(required=True)
-    #tiles_flipped = ndb.IntegerProperty(required=True)
     tiles_remaining = ndb.IntegerProperty(required=True)
     win = ndb.BooleanProperty(required=True, default=False)
     game_over = ndb.BooleanProperty(required=True, default=False)
@@ -164,10 +162,11 @@ class Game(ndb.Model):
                 self.stack[tile]['flip'] = True
                 self.tiles_remaining -= 1
                 if selected_tile['value'] == 'bomb':
-                    self.game_over = True
+                    self.end_game()
                 elif selected_tile['value'] == 0:
                     self.blank_tile_cascade(tile)
                 self.check_win()
+
     def blank_tile_cascade(self, tile):
         """Checks all surrounding nodes for 0 value, and flips them.
         Recursively checks each new empty node.
@@ -185,19 +184,33 @@ class Game(ndb.Model):
 
     def check_win(self):
         if self.tiles_remaining == self.num_of_bombs:
-            self.game_over = True
             self.win = True
+            self.end_game()
+
+    def end_game(self):
+        """Ends the game - if won is True, the player won. - if won is False,
+        the player lost."""
+        self.game_over = True
+        self.put()
+        # Add the game to the score 'board'
+        score = Score(user=self.user, date=date.today(), won=self.win,
+                      tiles_remaining=self.tiles_remaining,
+                      difficulty=self.difficulty)
+        score.put()
 
 class Score(ndb.Model):
     """Score object"""
     user = ndb.KeyProperty(required=True, kind='User')
     date = ndb.DateProperty(required=True)
     won = ndb.BooleanProperty(required=True)
-    guesses = ndb.IntegerProperty(required=True)
+    tiles_remaining = ndb.IntegerProperty(required=True)
+    difficulty = ndb.IntegerProperty(required=True)
 
     def to_form(self):
         return ScoreForm(user_name=self.user.get().name, won=self.won,
-                         date=str(self.date), guesses=self.guesses)
+                         date=str(self.date),
+                         tiles_remaining=self.tiles_remaining,
+                         difficulty=self.difficulty)
 
 
 class GameForm(messages.Message):
@@ -229,7 +242,7 @@ class ScoreForm(messages.Message):
     user_name = messages.StringField(1, required=True)
     date = messages.StringField(2, required=True)
     won = messages.BooleanField(3, required=True)
-    guesses = messages.IntegerField(4, required=True)
+    tiles_remaining = messages.IntegerField(4, required=True)
 
 
 class ScoreForms(messages.Message):

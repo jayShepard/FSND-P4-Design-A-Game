@@ -6,6 +6,7 @@ primarily with communication to/from the API's users."""
 
 import logging
 import endpoints
+from datetime import date
 
 from protorpc import remote, messages
 from google.appengine.api import memcache
@@ -103,12 +104,14 @@ class MineSweeperApi(remote.Service):
                     msg = 'You win!'
                 else:
                     msg = 'You lose!'
+                score = Score(date=date.today(), winner=winner, loser=loser)
+                score.put()
             else:
                 msg = 'Nice move!'
         game.put()
         return game.to_form(msg)
 
-'''
+
     @endpoints.method(response_message=ScoreForms,
                       path='scores',
                       name='get_scores',
@@ -130,7 +133,7 @@ class MineSweeperApi(remote.Service):
                     'A User with that name does not exist!')
         scores = Score.query(Score.user == user.key)
         return ScoreForms(items=[score.to_form() for score in scores])
-
+'''
     @endpoints.method(response_message=StringMessage,
                       path='games/average_attempts',
                       name='get_average_attempts_remaining',
