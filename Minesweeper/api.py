@@ -93,22 +93,8 @@ class MineSweeperApi(remote.Service):
 
         if game.first_move == True:
             game.add_bombs(request.tile)
-
-        if request.guess == game.target:
-            game.end_game(True)
-            return game.to_form('You win!')
-
-        if request.guess < game.target:
-            msg = 'Too low!'
-        else:
-            msg = 'Too high!'
-
-        if game.attempts_remaining < 1:
-            game.end_game(False)
-            return game.to_form(msg + ' Game over!')
-        else:
             game.put()
-            return game.to_form(msg)
+            return game.to_form('test')
 '''
     @endpoints.method(response_message=ScoreForms,
                       path='scores',

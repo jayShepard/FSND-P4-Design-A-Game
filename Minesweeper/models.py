@@ -105,11 +105,40 @@ class Game(ndb.Model):
 
         while count > 0:
             index = random.randint(0, len(self.stack)-1)
-            if self.stack[index]['value'] != '#' or index != protected_tile:
-                self.stack[index]['value'] = '#'
+            if not(self.stack[index]['value'] == 'bomb' or index == protected_tile):
+                self.stack[index]['value'] = 'bomb'
                 count -= 1
                 bomb_list.append(index)
-        #self.add_bomb_proximities(bomb_list)
+        self.add_bomb_proximities(bomb_list)
+
+    def add_bomb_proximities(self, bomb_list):
+        """surrounds bombs with proximity numbers"""
+        for bomb in bomb_list:
+            nodes = self.find_connecting_indexes(bomb)
+            for node in nodes:
+                value = self.stack[node]['value']
+                if value == 'bomb':
+                    continue
+                else:
+                    self.stack[node]['value'] += 1
+
+    def find_connecting_indexes(self, index):
+        """:Returns: a list of all adjacent indexes to a given index"""
+        nodes = []
+        x = self.stack_index[index][0]
+        y = self.stack_index[index][1]
+
+        for i in range(x-1, x+2):
+            for j in range(y-1, y+2):
+                if (i == x and j == y):
+                    continue
+                else:
+                    try:
+                        ad_index = self.stack_index.index((i,j))
+                        nodes.append(ad_index)
+                    except:
+                        continue
+        return nodes
 
 class Score(ndb.Model):
     """Score object"""
