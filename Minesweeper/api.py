@@ -65,7 +65,7 @@ class MineSweeperApi(remote.Service):
         # This operation is not needed to complete the creation of a new game
         # so it is performed out of sequence.
         #taskqueue.add(url='/tasks/cache_average_attempts')
-        return game.to_form('Good luck playing Guess a Number!')
+        return game.to_form('Good luck playing Minesweeper!')
 
     @endpoints.method(request_message=GET_GAME_REQUEST,
                       response_message=GameForm,
@@ -79,7 +79,7 @@ class MineSweeperApi(remote.Service):
             return game.to_form('Time to make a move!')
         else:
             raise endpoints.NotFoundException('Game not found!')
-'''
+
     @endpoints.method(request_message=MAKE_MOVE_REQUEST,
                       response_message=GameForm,
                       path='game/{urlsafe_game_key}',
@@ -91,7 +91,9 @@ class MineSweeperApi(remote.Service):
         if game.game_over:
             return game.to_form('Game already over!')
 
-        game.attempts_remaining -= 1
+        if game.first_move == True:
+            game.add_bombs(request.tile)
+
         if request.guess == game.target:
             game.end_game(True)
             return game.to_form('You win!')
@@ -107,7 +109,7 @@ class MineSweeperApi(remote.Service):
         else:
             game.put()
             return game.to_form(msg)
-
+'''
     @endpoints.method(response_message=ScoreForms,
                       path='scores',
                       name='get_scores',

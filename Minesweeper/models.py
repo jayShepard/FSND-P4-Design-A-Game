@@ -19,7 +19,7 @@ class Game(ndb.Model):
 
     x_range = ndb.IntegerProperty(required=True)
     stack = ndb.PickleProperty(required=True)
-    #stack_index = ndb.StructuredProperty(required=True)
+    stack_index = ndb.PickleProperty(required=True)
     difficulty = ndb.IntegerProperty(required=True)
     y_range = ndb.IntegerProperty(required=True)
     num_of_bombs = ndb.IntegerProperty(required=True)
@@ -30,6 +30,7 @@ class Game(ndb.Model):
     win = ndb.BooleanProperty(required=True, default=False)
     game_over = ndb.BooleanProperty(required=True, default=False)
     user = ndb.KeyProperty(required=True, kind='User')
+    first_move = ndb.BooleanProperty(required=True, default=True)
 
     @classmethod
     def new_game(cls, user, difficulty):
@@ -59,10 +60,13 @@ class Game(ndb.Model):
         game.flags_remaining = game.num_of_bombs
         game.tiles_remaining = (game.x_range*game.y_range)-game.num_of_bombs
         game.stack = []
+        game.stack_index = []
         for i in range(game.x_range):
             for j in range(game.y_range):
-                game.stack.append([(i, j), 0, False])
-        #self.generate_stack_index()
+                game.stack.append({'coordinate': (i, j),'value': 0,
+                                    'flip': False, 'flag': False})
+        for i in range(len(game.stack)):
+            game.stack_index.append(game.stack[i]['coordinate'])
         game.put()
         return game
 
@@ -75,8 +79,15 @@ class Game(ndb.Model):
         form.flag_remaining = self.flags_remaining
         form.num_of_bombs = self.num_of_bombs
         form.game_over = self.game_over
+        form.stack = str(self.stack)
+        form.stack_index = str(self.stack_index)
         form.message = message
         return form
+
+    def generate_stack_index(self):
+        """indexes the coordinates so their index is searchable"""
+        for i in range(len(self.stack)):
+            self.stack_index.append(self.stack[i]['coordinate'])
 
     def end_game(self, won=False):
         """Ends the game - if won is True, the player won. - if won is False,
@@ -88,6 +99,17 @@ class Game(ndb.Model):
                       guesses=self.attempts_allowed - self.attempts_remaining)
         score.put()
 
+    def add_bombs(self, protected_tile):
+        bomb_list =[]
+        count = self.num_of_bombs
+
+        while count > 0:
+            index = random.randint(0, len(self.stack)-1)
+            if self.stack[index]['value'] != '#' or index != protected_tile:
+                self.stack[index]['value'] = '#'
+                count -= 1
+                bomb_list.append(index)
+        #self.add_bomb_proximities(bomb_list)
 
 class Score(ndb.Model):
     """Score object"""
@@ -110,7 +132,8 @@ class GameForm(messages.Message):
     game_over = messages.BooleanField(5, required=True)
     message = messages.StringField(6, required=True)
     user_name = messages.StringField(7, required=True)
-
+    stack = messages.StringField(8, required=True)
+    stack_index = messages.StringField(9, required=True)
 
 class NewGameForm(messages.Message):
     """Used to create a new game"""
@@ -120,7 +143,8 @@ class NewGameForm(messages.Message):
 
 class MakeMoveForm(messages.Message):
     """Used to make a move in an existing game"""
-    guess = messages.IntegerField(1, required=True)
+    tile = messages.IntegerField(1, required=True)
+    flag = messages.BooleanField(2, default=False)
 
 
 class ScoreForm(messages.Message):
