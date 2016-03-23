@@ -98,6 +98,17 @@ class MineSweeperApi(remote.Service):
         else:
             raise endpoints.NotFoundException('Game not found!')
 
+    @endpoints.method(request_message=GET_GAME_REQUEST,
+                      response_message=StringMessage,
+                      path='game/{urlsafe_game_key}/history',
+                      name='get_name_history',
+                      http_method='GET')
+    def get_game_history(self.request):
+        game = get_by_urlsafe(request.urlsafe_game_key, Game)
+        if not game:
+            raise endpoints.NotFoundException('Game not found')
+        return StringMessage(message=str(game.history))
+
     @endpoints.method(request_message=MAKE_MOVE_REQUEST,
                       response_message=GameForm,
                       path='game/{urlsafe_game_key}',
@@ -125,6 +136,7 @@ class MineSweeperApi(remote.Service):
                 score.put()
             else:
                 msg = 'Nice move!'
+        game.add_to_game_history(request.tile, request.flag)
         game.put()
         return game.to_form(msg)
 

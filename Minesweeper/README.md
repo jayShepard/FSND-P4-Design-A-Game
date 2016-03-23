@@ -6,7 +6,7 @@
 3.(Optional) Generate your client library(ies) with the endpoints tool. Deploy your application
 
 ## Game Description:
-Minesweeper is a single player puzzle game. The player is presented with a grid, and must find all the hidden mines without detonating any. Numbered tiles are hidden around the mines to indicate how many are nearby. It is up to the player to then deduce the location of the mines. Using 'flip_tile', inputing online a tile number flips the tile. Including a True in the input allows the user to flap a tile without flipping it. Multiple games can be played at the same time and accessed with the path parameter 'urlsafe_game_key'.
+Minesweeper is a single player puzzle game. The player is presented with a grid, and must find all the hidden mines without detonating any. Numbered tiles are hidden around the mines to indicate how many are nearby. It is up to the player to then deduce the location of the mines. Using 'make_move', inputing online a tile number flips the tile. Including a True in the input allows the user to flap a tile without flipping it. Multiple games can be played at the same time and accessed with the path parameter 'urlsafe_game_key'.
 
 ## Files Included:
 - api.py: Contains endpoints and game playing logic.
@@ -42,7 +42,7 @@ Minesweeper is a single player puzzle game. The player is presented with a grid,
      - Returns: GameForm with current game state.
      - Description: Returns the current state of a game.
 
-- **flip_tile**
+- **make_move**
   - Path: 'game/{urlsafe_game_key}'
   - Method: PUT
   - Parameters: urlsafe_game_key, tile, flag(default=False)

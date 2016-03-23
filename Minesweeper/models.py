@@ -29,6 +29,7 @@ class Game(ndb.Model):
     game_over = ndb.BooleanProperty(required=True, default=False)
     user = ndb.KeyProperty(required=True, kind='User')
     first_move = ndb.BooleanProperty(required=True, default=True)
+    history = ndb.PickleProperty()
 
     @classmethod
     def new_game(cls, user, difficulty):
@@ -59,6 +60,7 @@ class Game(ndb.Model):
         game.tiles_remaining = (game.x_range*game.y_range)-game.num_of_bombs
         game.stack = []
         game.stack_index = []
+        game.history = []
         for i in range(game.x_range):
             for j in range(game.y_range):
                 game.stack.append({'coordinate': (i, j),'value': 0,
@@ -197,6 +199,14 @@ class Game(ndb.Model):
                       tiles_remaining=self.tiles_remaining,
                       difficulty=self.difficulty)
         score.put()
+
+    def add_to_game_history(self, tile, flag=False)
+        move = {
+        'tile': tile,
+        'flag':flag,
+        'coordinate': self.stack[tile]['coordinate'],
+        'value': self.stack[tile]['value']}
+        self.history.append(move)
 
 class Score(ndb.Model):
     """Score object"""
