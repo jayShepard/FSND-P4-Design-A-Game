@@ -75,7 +75,7 @@ class MineSweeperApi(remote.Service):
                       http_method='DELETE')
     def cancel_game(self, request):
         """Deletes an unfinished game"""
-        game = get_by_urlsafe(request.urlsafe_game_key)
+        game = get_by_urlsafe(request.urlsafe_game_key, Game)
         if game and not game.game_over:
             game.key.delete()
             return StringMessage(message='Game with key: {} deleted.'.
@@ -101,9 +101,10 @@ class MineSweeperApi(remote.Service):
     @endpoints.method(request_message=GET_GAME_REQUEST,
                       response_message=StringMessage,
                       path='game/{urlsafe_game_key}/history',
-                      name='get_name_history',
+                      name='get_game_history',
                       http_method='GET')
-    def get_game_history(self.request):
+    def get_game_history(self, request):
+        """Returns a move history for a game"""
         game = get_by_urlsafe(request.urlsafe_game_key, Game)
         if not game:
             raise endpoints.NotFoundException('Game not found')
@@ -132,14 +133,17 @@ class MineSweeperApi(remote.Service):
                     msg = 'You win!'
                 else:
                     msg = 'You lose!'
-                score = Score(date=date.today(), winner=winner, loser=loser)
+                score = Score(date=date.today(),
+                              user=game.user,
+                              tiles_remaining=game.tiles_remaining,
+                              difficulty=game.difficulty,
+                              won= game.win,)
                 score.put()
             else:
                 msg = 'Nice move!'
         game.add_to_game_history(request.tile, request.flag)
         game.put()
         return game.to_form(msg)
-
 
     @endpoints.method(response_message=ScoreForms,
                       path='scores',
@@ -163,6 +167,19 @@ class MineSweeperApi(remote.Service):
         scores = Score.query(Score.user == user.key)
         return ScoreForms(items=[score.to_form() for score in scores])
 '''
+    @endpoints.method(request_message=USER_REQUEST,
+                      response_message=GameForms,
+                      path='user/games',
+                      name='get_user_games',
+                      http_method='GET')
+    def get_user_games(self, request):
+        """Return all User's active games"""
+        user = User.query(User.name == request.user_name).get()
+        if not user:
+            raise endpoints.BadRequestException('User not found!')
+        games = Game.query(user=user).filter(Game.game_over == False)
+        return GameForms(items=[game.to_form() for game in games])
+
     @endpoints.method(response_message=StringMessage,
                       path='games/average_attempts',
                       name='get_average_attempts_remaining',

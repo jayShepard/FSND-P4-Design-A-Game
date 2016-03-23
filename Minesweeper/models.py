@@ -200,7 +200,7 @@ class Game(ndb.Model):
                       difficulty=self.difficulty)
         score.put()
 
-    def add_to_game_history(self, tile, flag=False)
+    def add_to_game_history(self, tile, flag=False):
         move = {
         'tile': tile,
         'flag':flag,
@@ -217,7 +217,8 @@ class Score(ndb.Model):
     difficulty = ndb.IntegerProperty(required=True)
 
     def to_form(self):
-        return ScoreForm(user_name=self.user.get().name, won=self.won,
+        return ScoreForm(user_name=self.user.get().name,
+                         won=self.won,
                          date=str(self.date),
                          tiles_remaining=self.tiles_remaining,
                          difficulty=self.difficulty)
@@ -234,6 +235,10 @@ class GameForm(messages.Message):
     user_name = messages.StringField(7, required=True)
     stack = messages.StringField(8, required=True)
     stack_index = messages.StringField(9, required=True)
+
+class GameForms(messages.Message):
+    """Container for multiple GameForm"""
+    items = messages.MessageField(GameForm, 1, repeated=True)
 
 class NewGameForm(messages.Message):
     """Used to create a new game"""
@@ -253,7 +258,7 @@ class ScoreForm(messages.Message):
     date = messages.StringField(2, required=True)
     won = messages.BooleanField(3, required=True)
     tiles_remaining = messages.IntegerField(4, required=True)
-
+    difficulty = messages.IntegerField(5,)
 
 class ScoreForms(messages.Message):
     """Return multiple ScoreForms"""

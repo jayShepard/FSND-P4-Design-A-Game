@@ -92,7 +92,7 @@ class TicTacToeAPI(remote.Service):
         games = Game.query(ndb.OR(Game.user_x == user.key,
                                   Game.user_o == user.key)).\
             filter(Game.game_over == False)
-        return GameForms(items=[game.to_form() for game in games])
+        return GameForms(items=[game.to_form() for gam e in games])
 
     @endpoints.method(request_message=GET_GAME_REQUEST,
                       response_message=StringMessage,
