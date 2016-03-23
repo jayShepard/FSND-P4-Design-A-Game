@@ -70,7 +70,7 @@ class Game(ndb.Model):
         game.put()
         return game
 
-    def to_form(self, message):
+    def to_form(self, message=None):
         """Returns a GameForm representation of the Game"""
         form = GameForm()
         form.urlsafe_key = self.key.urlsafe()
@@ -82,6 +82,7 @@ class Game(ndb.Model):
         form.stack = str(self.stack)
         form.stack_index = str(self.stack_index)
         form.message = message
+        form.difficulty = self.difficulty
         return form
 
     def generate_stack_index(self):
@@ -231,10 +232,11 @@ class GameForm(messages.Message):
     flag_remaining = messages.IntegerField(3, required=True)
     num_of_bombs = messages.IntegerField(4, required=True)
     game_over = messages.BooleanField(5, required=True)
-    message = messages.StringField(6, required=True)
+    message = messages.StringField(6)
     user_name = messages.StringField(7, required=True)
     stack = messages.StringField(8, required=True)
     stack_index = messages.StringField(9, required=True)
+    difficulty = message.IntegerField(10)
 
 class GameForms(messages.Message):
     """Container for multiple GameForm"""
