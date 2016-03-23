@@ -14,7 +14,7 @@ from google.appengine.api import taskqueue
 
 from models import User, Game, Score
 from models import StringMessage, NewGameForm, GameForm, MakeMoveForm,\
-    ScoreForms, GameForms
+    ScoreForms, GameForms, UserForm, UserForms
 from utils import get_by_urlsafe
 
 NEW_GAME_REQUEST = endpoints.ResourceContainer(NewGameForm)
@@ -197,9 +197,20 @@ class MineSweeperApi(remote.Service):
                       path='games/average_tiles',
                       name='get_average_tiles_remaining',
                       http_method='GET')
-    def get_tiles_attempts(self, request):
+    def get_average_tiles(self, request):
         """Get the cached average moves remaining"""
         return StringMessage(message=memcache.get(MEMCACHE_TILES_REMAINING) or '')
+
+    @endpoints.method(response_message=ScoreForms,
+                      path='games/high_score',
+                      name='get_high_score',
+                      http_method='GET')
+    def get_high_score(self, request):
+        """Returns the top 10 high scores"""
+        scores = Score.query().order(-Score.difficulty,
+                                     -Score.won,
+                                     -Score.tiles_remaining).get(10)
+        return ScoreForms(scores=[score.to_form() for score in scores])
 
     @staticmethod
     def _cache_tiles_attempts():
