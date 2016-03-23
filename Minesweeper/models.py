@@ -45,7 +45,7 @@ class Game(ndb.Model):
 
     x_range = ndb.IntegerProperty(required=True)
     stack = ndb.PickleProperty(required=True)
-    stack_index = ndb.PickleProperty(required=True)
+    stack_index = ndb.PickleProperty(required=True, indexed=True)
     difficulty = ndb.IntegerProperty(required=True)
     y_range = ndb.IntegerProperty(required=True)
     num_of_bombs = ndb.IntegerProperty(required=True)
