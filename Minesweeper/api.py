@@ -26,7 +26,7 @@ MAKE_MOVE_REQUEST = endpoints.ResourceContainer(
 USER_REQUEST = endpoints.ResourceContainer(user_name=messages.StringField(1),
                                            email=messages.StringField(2))
 
-MEMCACHE_MOVES_REMAINING = 'MOVES_REMAINING'
+MEMCACHE_TILES_REMAINING = 'TILES_REMAINING'
 
 @endpoints.api(name='minesweeper', version='v1')
 class MineSweeperApi(remote.Service):
@@ -192,26 +192,26 @@ class MineSweeperApi(remote.Service):
             raise endpoints.BadRequestException('User not found!')
         games = Game.query(Game.user==user.key).filter(Game.game_over == False)
         return GameForms(items=[game.to_form() for game in games])
-'''
+
     @endpoints.method(response_message=StringMessage,
-                      path='games/average_attempts',
-                      name='get_average_attempts_remaining',
+                      path='games/average_tiles',
+                      name='get_average_tiles_remaining',
                       http_method='GET')
-    def get_average_attempts(self, request):
+    def get_tiles_attempts(self, request):
         """Get the cached average moves remaining"""
-        return StringMessage(message=memcache.get(MEMCACHE_MOVES_REMAINING) or '')
+        return StringMessage(message=memcache.get(MEMCACHE_TILES_REMAINING) or '')
 
     @staticmethod
-    def _cache_average_attempts():
+    def _cache_tiles_attempts():
         """Populates memcache with the average moves remaining of Games"""
         games = Game.query(Game.game_over == False).fetch()
         if games:
             count = len(games)
-            total_attempts_remaining = sum([game.attempts_remaining
+            total_tiles_remaining = sum([game.tiless_remaining
                                         for game in games])
-            average = float(total_attempts_remaining)/count
-            memcache.set(MEMCACHE_MOVES_REMAINING,
-                         'The average moves remaining is {:.2f}'.format(average))
-'''
+            average = float(total_tiles_remaining)/count
+            memcache.set(MEMCACHE_TILES_REMAINING,
+                         'The average tiles remaining is {:.2f}'.format(average))
+
 
 api = endpoints.api_server([MineSweeperApi])

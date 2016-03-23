@@ -28,10 +28,10 @@ class SendReminderEmail(webapp2.RequestHandler):
                            body)
 
 
-class UpdateAverageMovesRemaining(webapp2.RequestHandler):
+class UpdateAverageTilesRemaining(webapp2.RequestHandler):
     def post(self):
         """Update game listing announcement in memcache."""
-        MineSweeperApi._cache_average_attempts()
+        MineSweeperApi._cache_average_tiles()
         self.response.set_status(204)
 
 
