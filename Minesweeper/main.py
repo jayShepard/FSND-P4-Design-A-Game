@@ -37,5 +37,5 @@ class UpdateAverageTilesRemaining(webapp2.RequestHandler):
 
 app = webapp2.WSGIApplication([
     ('/crons/send_reminder', SendReminderEmail),
-    ('/tasks/cache_average_attempts', UpdateAverageMovesRemaining),
+    ('/tasks/cache_average_tiles', UpdateAverageTilesRemaining),
 ], debug=True)

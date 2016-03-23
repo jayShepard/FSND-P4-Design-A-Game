@@ -75,7 +75,7 @@ class MineSweeperApi(remote.Service):
         # Use a task queue to update the average attempts remaining.
         # This operation is not needed to complete the creation of a new game
         # so it is performed out of sequence.
-        #taskqueue.add(url='/tasks/cache_average_attempts')
+        taskqueue.add(url='/tasks/cache_average_tiles')
         return game.to_form('Good luck playing Minesweeper!')
 
     @endpoints.method(request_message=GET_GAME_REQUEST,
@@ -209,16 +209,16 @@ class MineSweeperApi(remote.Service):
         """Returns the top 10 high scores"""
         scores = Score.query().order(-Score.difficulty,
                                      -Score.won,
-                                     -Score.tiles_remaining).get(10)
-        return ScoreForms(scores=[score.to_form() for score in scores])
+                                     Score.tiles_remaining).fetch(limit=10)
+        return ScoreForms(items=[score.to_form() for score in scores])
 
     @staticmethod
-    def _cache_tiles_attempts():
+    def _cache_average_tiles():
         """Populates memcache with the average moves remaining of Games"""
         games = Game.query(Game.game_over == False).fetch()
         if games:
             count = len(games)
-            total_tiles_remaining = sum([game.tiless_remaining
+            total_tiles_remaining = sum([game.tiles_remaining
                                         for game in games])
             average = float(total_tiles_remaining)/count
             memcache.set(MEMCACHE_TILES_REMAINING,
