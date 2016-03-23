@@ -46,6 +46,16 @@ class MineSweeperApi(remote.Service):
         return StringMessage(message='User {} created!'.format(
                 request.user_name))
 
+    @endpoints.method(response_message=UserForms,
+                      path='user/ranking',
+                      name='get_user_rankings',
+                      http_method='GET')
+    def get_user_rankings(self, request):
+        """Return all Users ranked by their win percentage"""
+        users = User.query(User.total_played > 0).fetch()
+        users = sorted(users, key=lambda x: x.win_percentage, reverse=True)
+        return UserForms(items=[user.to_form() for user in users])
+
     @endpoints.method(request_message=NEW_GAME_REQUEST,
                       response_message=GameForm,
                       path='game',
@@ -118,6 +128,7 @@ class MineSweeperApi(remote.Service):
     def make_move(self, request):
         """Makes a move. Returns a game state with message"""
         game = get_by_urlsafe(request.urlsafe_game_key, Game)
+        user = User.query(User.name==game.user).get()
         msg = ''
         if game.game_over:
             return game.to_form('Game already over!')
@@ -130,8 +141,10 @@ class MineSweeperApi(remote.Service):
             game.flip_tile(request.tile, request.flag)
             if game.game_over == True:
                 if game.win == True:
+                    user.add_win()
                     msg = 'You win!'
                 else:
+                    user.add_loss()
                     msg = 'You lose!'
                 score = Score(date=date.today(),
                               user=game.user,
