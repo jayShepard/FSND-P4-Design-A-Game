@@ -63,6 +63,42 @@ Minesweeper is a single player puzzle game. The player is presented with a grid,
      - Description: Returns all Scores recorded by the provided player (unordered).
      Will raise a NotFoundException if the User does not exist.
 
+- **get_user_games**
+  - Path: 'user/games'
+  - Method: GET
+  - Parameters: user_name
+  - Returns: GameForms with 1 or more GameForm inside.
+  - Description: Returns the current state of all the User's active games.
+
+- **cancel_game**
+  - Path: 'game/{urlsafe_game_key}'
+  - Method: DELETE
+  - Parameters: urlsafe_game_key
+  - Returns: StringMessage confirming deletion
+  - Description: Deletes the game. If the game is already completed an error
+    will be thrown.
+
+- **get_user_rankings**
+  - Path: 'user/ranking'
+  - Method: GET
+  - Parameters: None
+  - Returns: UserForms
+  - Description: Rank all players that have played at least one game by their
+    winning percentage and return.
+
+- **get_game_history**
+  - Path: 'game/{urlsafe_game_key}/history'
+  - Method: GET
+  - Parameters: urlsafe_game_key
+  - Returns: StringMessage containing history
+  - Description: Returns the move history of a game
+
+- **get_high_score**
+  - Path: 'games/high_score'
+  - Method: GET
+  - Returns: ScoreForms ordered by high score
+  - Description: An list top 10 games, ordered by difficulty, tiles_remaining
+
 ## Models Included:
 - **User**
   - Stores unique user_name and (optional) email address.
@@ -73,18 +109,33 @@ Minesweeper is a single player puzzle game. The player is presented with a grid,
 - **Score**
   - Records completed games. Associated with Users model via KeyProperty.
 
-##Forms Included:
-   - **GameForm**
-      - Representation of a Game's state (urlsafe_key, tiles_remaining,
+## Forms Included:
+- **UserForm**
+    - Respresentation of a User (name, email, wins, total_played, win_percentage)
+- **UserForms**
+    - Multiple UserForm container
+- **GameForm**
+    - Representation of a Game's state (urlsafe_key, tiles_remaining,
       flag_remaining, num_of_bombs, game_over, message, usr_name, stack, stack_index).
-   - **NewGameForm**
-      - Used to create a new game (user_name, difficulty)
-   - **MakeMoveForm**
-      - Inbound make move form (tile, flag).
-   - **ScoreForm**
-      - Representation of a completed game's Score (user_name, date, won flag,
+- **GameForms**
+    - Multiple GameForm container.
+- **NewGameForm**
+  - Used to create a new game (user_name, difficulty)
+- **MakeMoveForm**
+  - Inbound make move form (tile, flag).
+- **ScoreForm**
+  - Representation of a completed game's Score (user_name, date, won flag,
       tiles_remaining).
-   - **ScoreForms**
-      - Multiple ScoreForm container.
-   - **StringMessage**
-      - General purpose String container.
+- **ScoreForms**
+  - Multiple ScoreForm container.
+- **StringMessage**
+  - General purpose String container.
+
+## Design Decisions
+ - I added a field called stack which is a stack of lists containing all the pertinent information of every tile. Combined with stack_index, it allows the stack to be easily seach for any given coordinate on the game board.
+ - Whomever impliments the game will be responsible for feeding the stack into a proper square grid. x_range and y_range were included fields to ensure the grid is represented
+ correctly
+ - There are also fields to track the number of bombs, flags_remaining, tiles_remaining. These are mainly used to determine the current state of the game, along with game_over to determine if the game is over.
+ -I added first_move to track the first move of the player. The reason is that when the game is initially started, the board is actually empty. When the user chooses their first tile, the board is then populated, using the user's input as an exclusion to ensure they can't lose on their first flip.
+ - In order to streamline the endpoints, flip_tile takes care of all win/ lose checking
+ 

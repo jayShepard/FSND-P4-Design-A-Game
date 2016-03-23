@@ -171,8 +171,9 @@ class Game(ndb.Model):
         return nodes
 
     def flip_tile(self, tile, flag=False):
-        #tile_index = self.stack_index.index(tile)
-
+        """If flag = true, marks tile as flagged. Otherwise, flips tile
+        and cascade flips blank tiles, ends the game if tile is a mine. Checks
+        win state before concluding"""
         selected_tile = self.stack[tile]
 
         if flag == True:
@@ -212,6 +213,7 @@ class Game(ndb.Model):
                     self.blank_tile_cascade(node)
 
     def check_win(self):
+        """checks win state"""
         if self.tiles_remaining == self.num_of_bombs:
             self.win = True
             self.end_game()
@@ -228,6 +230,7 @@ class Game(ndb.Model):
         score.put()
 
     def add_to_game_history(self, tile, flag=False):
+        """adds move to game history"""
         move = {
         'tile': tile,
         'flag':flag,

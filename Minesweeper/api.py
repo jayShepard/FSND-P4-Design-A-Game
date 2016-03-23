@@ -207,8 +207,7 @@ class MineSweeperApi(remote.Service):
                       http_method='GET')
     def get_high_score(self, request):
         """Returns the top 10 high scores"""
-        scores = Score.query().order(-Score.difficulty,
-                                     -Score.won,
+        scores = Score.query(Score.won == True).order(-Score.difficulty,
                                      Score.tiles_remaining).fetch(limit=10)
         return ScoreForms(items=[score.to_form() for score in scores])
 
