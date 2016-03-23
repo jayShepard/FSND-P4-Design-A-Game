@@ -10,7 +10,7 @@
 
 
 
-##Game Description:
+## Game Description:
 Guess a number is a simple guessing game. Each game begins with a random 'target'
 number between the minimum and maximum values provided, and a maximum number of
 'attempts'. 'Guesses' are sent to the `make_move` endpoint which will reply
@@ -110,4 +110,3 @@ given time. Each game can be retrieved or played by using the path parameter
     - Multiple ScoreForm container.
  - **StringMessage**
     - General purpose String container.
-    
