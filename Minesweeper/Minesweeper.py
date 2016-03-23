@@ -75,7 +75,6 @@ class Minesweeper:
 
 
     def add_bombs(self, protected_tile):
-        bomb_list = []
         count = self.num_of_bombs
 
         while count > 0:

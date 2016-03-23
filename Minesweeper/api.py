@@ -69,6 +69,23 @@ class MineSweeperApi(remote.Service):
         return game.to_form('Good luck playing Minesweeper!')
 
     @endpoints.method(request_message=GET_GAME_REQUEST,
+                      response_message=StringMessage,
+                      path='game/{urlsafe_game_key}',
+                      name='cancel_game',
+                      http_method='DELETE')
+    def cancel_game(self, request):
+        """Deletes an unfinished game"""
+        game = get_by_urlsafe(request.urlsafe_game_key)
+        if game and not game.game_over:
+            game.key.delete()
+            return StringMessage(message='Game with key: {} deleted.'.
+                                    format(request.urlsafe_game_key))
+        elif game and game.game_over:
+            raise endpoints.BadRequestException('Game is already over!')
+        else:
+            raise endpoints.NotFoundException('Game not found!')
+
+    @endpoints.method(request_message=GET_GAME_REQUEST,
                       response_message=GameForm,
                       path='game/{urlsafe_game_key}',
                       name='get_game',
